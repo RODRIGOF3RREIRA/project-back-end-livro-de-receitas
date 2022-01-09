@@ -39,28 +39,28 @@ export class ReceitaController {
     });
   }
 
-  updateReceita(req: Request, res: Response) {
-    const { nome } = req.params;
+  async updateReceita(req: Request, res: Response) {
+    const { id } = req.params;
     const { preparo } = req.body;
-    const receita = this.receitaRepository.findByName(nome);
+    const receita = await this.receitaRepository.findById(Number(id));
     if (!receita) {
       return res.status(404).json({
         mensagem: 'Receita não encontrada',
       });
     }
-    this.receitaRepository.updatePreparo(nome, preparo);
+    await this.receitaRepository.updatePreparo(Number(id), preparo);
     return res.status(204).send();
   }
 
-  deleteReceita(req: Request, res: Response) {
-    const { nome } = req.params;
-    const receita = this.receitaRepository.findByName(nome);
+  async deleteReceita(req: Request, res: Response) {
+    const { id } = req.params;
+    const receita = await this.receitaRepository.findById(Number(id));
     if (!receita) {
       return res.status(404).json({
         mensagem: 'Receita não encontrada',
       });
     }
-    this.receitaRepository.remove(nome);
+    await this.receitaRepository.remove(Number(id));
     return res.status(204).send();
   }
 

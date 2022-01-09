@@ -13,11 +13,11 @@ app.get('/receita/:nome', async (req, res) =>
   receitaController.getReceitaByName(req, res),
 );
 
-app.patch('/receita/:nome', (req, res) =>
+app.patch('/receita/:id', async (req, res) =>
   receitaController.updateReceita(req, res),
 );
 
-app.delete('/receita/:nome', (req, res) =>
+app.delete('/receita/:id', async (req, res) =>
   receitaController.deleteReceita(req, res),
 );
 

@@ -1,36 +1,31 @@
-import pgp from 'pg-promise';
+import { PrismaClient } from '@prisma/client';
 import { Receita } from '../entities/receita';
 
 export class ReceitaRepository {
-  private receitas: Receita[];
-  private pgpClient;
+  private prisma;
 
   constructor() {
-    this.receitas = [];
-    this.pgpClient = pgp()(
-      'postgres://postgres:postgres@localhost:5432/postgres',
-    );
+    this.prisma = new PrismaClient();
   }
 
   async insert(receita: Receita): Promise<void> {
-    await this.pgpClient.query(
-      `insert into receita (id, name, type, prepare, portions) values ($1, $2, $3, $4, $5)`,
-      [
-        receita.id,
-        receita.nome,
-        receita.tipo,
-        receita.preparo,
-        receita.porcoes,
-      ],
-    );
-    this.receitas.push(receita);
+    await this.prisma.receita.create({
+      data: {
+        id: receita.id,
+        name: receita.nome,
+        type: receita.tipo,
+        prepare: receita.preparo,
+        portions: receita.porcoes,
+      },
+    });
   }
 
   async findByName(name: string): Promise<Receita | undefined> {
-    const [result] = await this.pgpClient.query(
-      'select * from receita where name = $1',
-      [name],
-    );
+    const result = await this.prisma.receita.findFirst({
+      where: {
+        name,
+      },
+    });
     if (!result) {
       return undefined;
     }
@@ -43,18 +38,44 @@ export class ReceitaRepository {
     );
   }
 
-  async updatePreparo(name: string, prepare: string) {
-    const receita = (await this.findByName(name)) as Receita;
-    this.receitas = this.receitas.filter((r) => r.nome !== name);
-    receita.preparo = prepare;
-    this.receitas.push(receita);
+  async findById(id: number) {
+    const result = await this.prisma.receita.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!result) {
+      return undefined;
+    }
+    return new Receita(
+      result.name,
+      result.type,
+      result.prepare,
+      result.portions,
+      result.id,
+    );
   }
 
-  remove(name: string) {
-    this.receitas = this.receitas.filter((r) => r.nome !== name);
+  async updatePreparo(id: number, prepare: string) {
+    await this.prisma.receita.update({
+      data: {
+        prepare,
+      },
+      where: {
+        id,
+      },
+    });
+  }
+
+  async remove(id: number) {
+    await this.prisma.receita.delete({
+      where: {
+        id,
+      },
+    });
   }
 
   async findAll() {
-    return this.pgpClient.query('select * from receita');
+    return this.prisma.receita.findMany();
   }
 }
