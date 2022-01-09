@@ -9,10 +9,10 @@ export class ReceitaController {
     this.receitaRepository = new ReceitaRepository();
   }
 
-  createReceita(req: Request, res: Response) {
+  async createReceita(req: Request, res: Response) {
     const { nome, tipo, preparo, porcoes } = req.body;
     const receita = new Receita(nome, tipo, preparo, porcoes);
-    this.receitaRepository.insert(receita);
+    await this.receitaRepository.insert(receita);
     res.status(201).json({
       id: receita.id,
       nome: receita.nome,
@@ -22,9 +22,9 @@ export class ReceitaController {
     });
   }
 
-  getReceitaByName(req: Request, res: Response) {
+  async getReceitaByName(req: Request, res: Response) {
     const { nome } = req.params;
-    const receita = this.receitaRepository.findByName(nome);
+    const receita = await this.receitaRepository.findByName(nome);
     if (!receita) {
       return res.status(404).json({
         message: 'Receita não encontrada',
@@ -64,8 +64,8 @@ export class ReceitaController {
     return res.status(204).send();
   }
 
-  getAll(req: Request, res: Response) {
-    const receitas = this.receitaRepository.findAll();
+  async getAll(req: Request, res: Response) {
+    const receitas = await this.receitaRepository.findAll();
     return res.status(200).json(receitas);
   }
 }
