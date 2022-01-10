@@ -17,6 +17,9 @@
   "scripts": {
     "dev": "ts-node-dev --exit-child --respawn --ignore-watch node_modules --transpile-only src/server.ts"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^3.7.0",
     "express": "^4.17.2"

@@ -8,9 +8,16 @@ datasource db {
 }
 
 model receita {
-  id       Int     @id
+  id       Int    @id
   name     String
-  type     String
   prepare  String
   portions Int
+  typeId   Int
+  type     Type   @relation(fields: [typeId], references: [id])
+}
+
+model Type {
+  id      Int       @id
+  name    String
+  receita receita[]
 }

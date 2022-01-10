@@ -1,19 +1,28 @@
 import { Request, Response } from 'express';
 import { Receita } from '../entities/receita';
 import { ReceitaRepository } from '../repositories/receita-repository';
+import { ReceitaTypeRepository } from '../repositories/receita-type-repository';
 
 export class ReceitaController {
   private receitaRepository: ReceitaRepository;
+  private receitaTypeRepository: ReceitaTypeRepository;
 
   constructor() {
     this.receitaRepository = new ReceitaRepository();
+    this.receitaTypeRepository = new ReceitaTypeRepository();
   }
 
   async createReceita(req: Request, res: Response) {
     const { nome, tipo, preparo, porcoes } = req.body;
-    const receita = new Receita(nome, tipo, preparo, porcoes);
+    const ReceitaType = await this.receitaTypeRepository.findById(tipo);
+    if (!ReceitaType) {
+      return res.status(404).json({
+        mensagem: 'Tipo de receita não encontrado',
+      });
+    }
+    const receita = new Receita(nome, ReceitaType, preparo, porcoes);
     await this.receitaRepository.insert(receita);
-    res.status(201).json({
+    return res.status(201).json({
       id: receita.id,
       nome: receita.nome,
       tipo: receita.tipo,

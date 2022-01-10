@@ -1,13 +1,15 @@
+import { ReceitaType } from './receita-type';
+
 export class Receita {
   public id: number;
   public nome: string;
-  public tipo: string;
+  public tipo: ReceitaType;
   public preparo: string;
   public porcoes: number;
 
   constructor(
     nome: string,
-    tipo: string,
+    tipo: ReceitaType,
     preparo: string,
     porcoes: number,
     id?: number,

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Receita } from '../entities/receita';
+import { ReceitaType } from '../entities/receita-type';
 
 export class ReceitaRepository {
   private prisma;
@@ -13,7 +14,7 @@ export class ReceitaRepository {
       data: {
         id: receita.id,
         name: receita.nome,
-        type: receita.tipo,
+        typeId: receita.tipo.id,
         prepare: receita.preparo,
         portions: receita.porcoes,
       },
@@ -25,13 +26,16 @@ export class ReceitaRepository {
       where: {
         name,
       },
+      include: {
+        type: true,
+      },
     });
     if (!result) {
       return undefined;
     }
     return new Receita(
       result.name,
-      result.type,
+      new ReceitaType(result.type.id, result.type.name),
       result.prepare,
       result.portions,
       result.id,
@@ -43,13 +47,16 @@ export class ReceitaRepository {
       where: {
         id,
       },
+      include: {
+        type: true,
+      },
     });
     if (!result) {
       return undefined;
     }
     return new Receita(
       result.name,
-      result.type,
+      new ReceitaType(result.type.id, result.type.name),
       result.prepare,
       result.portions,
       result.id,
@@ -76,6 +83,10 @@ export class ReceitaRepository {
   }
 
   async findAll() {
-    return this.prisma.receita.findMany();
+    return this.prisma.receita.findMany({
+      include: {
+        type: true,
+      },
+    });
   }
 }
